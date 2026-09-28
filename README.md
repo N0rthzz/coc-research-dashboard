@@ -1,0 +1,29 @@
+# CoC Publications Dashboard
+
+โปรเจกต์สำหรับอัปขึ้น Git และรันด้วย Docker บนเครื่องหรือเซิร์ฟเวอร์ที่รองรับ Docker และ **persistent volume** ข้อมูลเริ่มต้นมี 717 รายการจาก `Publications CV-10-2025.csv` การเปลี่ยนแปลงและประวัติจะบันทึกแยกใน volume
+
+## รันบนเครื่อง
+
+1. แตก ZIP แล้วอัปไฟล์ในโฟลเดอร์นี้ขึ้น Git repository ของคุณ (อย่าอัป `.env` หรือ `storage/`)
+2. คัดลอก `.env.example` เป็น `.env` แล้วตั้ง `ADMIN_USER` และ `ADMIN_PASSWORD` ให้เป็นรหัสผ่านยาวที่เดายาก
+3. รัน `docker compose up --build -d`
+4. เปิด `http://localhost:8000` และกรอกชื่อผู้ใช้/รหัสผ่านเมื่อเบราว์เซอร์ถาม
+
+ถ้าไม่ใช้ Docker รันด้วย Python 3.9 ขึ้นไป โดยตั้ง `ADMIN_USER` และ `ADMIN_PASSWORD` ใน environment แล้วใช้ `python server.py` ข้อมูลจะอยู่ใน `storage/`
+
+## นำไปฝากรัน
+
+โฮสต์ต้องรองรับ Docker, ตั้งค่า environment variables และ **mount โฟลเดอร์ `/data` เป็นพื้นที่ถาวร** หากไม่มี persistent volume ข้อมูลที่เพิ่มหรือแก้ไขอาจหายเมื่อ deploy ใหม่ ตั้ง `HOST=0.0.0.0`, `PORT=8000` และ `DATA_DIR=/data` ตาม Dockerfile ให้บริการผ่าน HTTPS เท่านั้น เพราะ HTTP Basic Auth ส่งรหัสผ่านในรูปแบบที่ถอดได้หากไม่มี HTTPS
+
+หลัง deploy ให้ตรวจว่าเพิ่มรายการทดสอบแล้วรีสตาร์ต container ยังเห็นรายการและ log อยู่ ก่อนใช้เก็บข้อมูลจริง
+
+## ไฟล์ข้อมูล
+
+- `data.json`: ข้อมูลต้นฉบับสำหรับการเริ่มระบบครั้งแรก ไม่เขียนทับ
+- `/data/publications.json`: ข้อมูลผลงานล่าสุด
+- `/data/staff_programs.json`: หลักสูตรของอาจารย์
+- `/data/changes.jsonl`: ประวัติการเปลี่ยนแปลง
+
+สำรอง volume `/data` เป็นประจำ ถ้ามีข้อมูลเดิมจาก ZIP local ให้คัดลอกไฟล์ JSON และ JSONL ทั้งสามไปไว้ใน volume ก่อนเปิด container ครั้งแรก
+
+ระบบนี้เหมาะกับการใช้งานแบบผู้ดูแลคนเดียว หากจะเปิดให้หลายคนแก้พร้อมกัน ควรเปลี่ยน backend เป็นฐานข้อมูลแบบ transaction และจัดการสิทธิ์รายบัญชี
