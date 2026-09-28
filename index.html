@@ -6,6 +6,1046 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ผลงานวิชาการ · วิทยาลัยการคอมพิวเตอร์</title>
   <style>
+    :root {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #172941;
+      background: #f4f7fb
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0
+    }
+
+    button,
+    select,
+    input {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    header {
+      background: #102642;
+      color: white;
+      padding: 20px max(24px, calc((100vw - 1320px)/2));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px
+    }
+
+    header strong {
+      font-size: 20px
+    }
+
+    header small {
+      color: #b9cadc
+    }
+
+    main {
+      max-width: 1368px;
+      margin: auto;
+      padding: 25px 24px 70px
+    }
+
+    .heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px
+    }
+
+    .heading h1 {
+      margin: 0;
+      font-size: 26px
+    }
+
+    .muted {
+      color: #62758a
+    }
+
+    .heading p {
+      margin: 4px 0 0
+    }
+
+    .filters,
+    .panel,
+    .metric {
+      background: #fff;
+      border: 1px solid #dce5ee;
+      border-radius: 14px;
+      box-shadow: 0 3px 14px #18375908
+    }
+
+    .filters {
+      padding: 19px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(110px, 1fr)) minmax(230px, 2fr) minmax(190px, 1.5fr) auto;
+      gap: 13px;
+      align-items: end
+    }
+
+    .field label,
+    .field>span {
+      display: block;
+      font-size: 14px;
+      font-weight: 650;
+      margin-bottom: 7px
+    }
+
+    .field select,
+    .field input,
+    .pickbutton {
+      width: 100%;
+      border: 1px solid #c9d6e3;
+      border-radius: 9px;
+      background: white;
+      color: #172941;
+      height: 42px;
+      padding: 0 11px
+    }
+
+    .pickbutton {
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .picker {
+      position: relative
+    }
+
+    .menu {
+      position: absolute;
+      z-index: 10;
+      background: white;
+      border: 1px solid #c9d6e3;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px #10264220;
+      top: 47px;
+      left: 0;
+      width: min(370px, 90vw);
+      padding: 12px;
+      max-height: 320px;
+      overflow: auto
+    }
+
+    .menu[hidden] {
+      display: none
+    }
+
+    .menu input[type=search] {
+      height: 39px;
+      width: 100%;
+      padding: 0 9px;
+      border: 1px solid #c9d6e3;
+      border-radius: 7px;
+      margin-bottom: 7px
+    }
+
+    .option {
+      display: flex;
+      align-items: start;
+      gap: 9px;
+      padding: 7px 5px;
+      font-size: 14px;
+      cursor: pointer
+    }
+
+    .option input {
+      margin: 3px 0
+    }
+
+    .option:hover {
+      background: #f2f6fb
+    }
+
+    .quiet {
+      background: #eff4f9;
+      border: 0;
+      border-radius: 9px;
+      height: 42px;
+      padding: 0 14px;
+      color: #243e5d
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 16px 0
+    }
+
+    .metric {
+      padding: 17px 19px
+    }
+
+    .metric span {
+      font-size: 14px;
+      color: #60758b
+    }
+
+    .metric strong {
+      font-size: 28px;
+      display: block;
+      margin-top: 4px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 16px
+    }
+
+    .panel {
+      padding: 21px;
+      min-width: 0
+    }
+
+    .panel h2 {
+      font-size: 18px;
+      margin: 0 0 5px
+    }
+
+    .panel .hint {
+      font-size: 13px;
+      color: #64788c;
+      margin: 0 0 15px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .chip {
+      border: 1px solid #c8d5e2;
+      border-radius: 8px;
+      background: white;
+      padding: 8px 12px;
+      font-size: 14px
+    }
+
+    .chip.active {
+      background: #153d68;
+      color: white;
+      border-color: #153d68
+    }
+
+    .chart {
+      overflow-x: auto;
+      min-height: 285px
+    }
+
+    .chart svg {
+      width: 100%;
+      min-width: 460px;
+      height: 280px
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #526b82;
+      margin-top: 8px
+    }
+
+    .legend span:before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: var(--color);
+      margin-right: 6px
+    }
+
+    .listpanel {
+      margin-top: 16px
+    }
+
+    .listtop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap
+    }
+
+    .listtop input {
+      height: 40px;
+      padding: 0 10px;
+      border: 1px solid #c9d6e3;
+      border-radius: 8px;
+      width: min(330px, 100%)
+    }
+
+    .record {
+      padding: 16px 0;
+      border-top: 1px solid #e5ebf2
+    }
+
+    .record:first-child {
+      border-top: 0
+    }
+
+    .record h3 {
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 4px 0;
+      font-weight: 550
+    }
+
+    .record small {
+      color: #677c91;
+      line-height: 1.6
+    }
+
+    .tag {
+      display: inline-block;
+      background: #eaf1fa;
+      color: #24517e;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-right: 7px
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 12px;
+      margin-top: 13px
+    }
+
+    .pager button {
+      padding: 8px 12px;
+      border: 1px solid #c9d6e3;
+      background: white;
+      border-radius: 8px
+    }
+
+    .note {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #657b90;
+      margin-top: 14px
+    }
+
+    .linkbutton {
+      color: #155d9c;
+      background: none;
+      border: 0;
+      text-decoration: underline;
+      padding: 0
+    }
+
+    .programbox {
+      margin-top: 16px
+    }
+
+    .programbox[hidden] {
+      display: none
+    }
+
+    .programbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px
+    }
+
+    .programgrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 11px;
+      margin-top: 15px
+    }
+
+    .programitem {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 13px
+    }
+
+    .programitem select {
+      height: 37px;
+      padding: 0 7px;
+      border: 1px solid #c9d6e3;
+      border-radius: 7px
+    }
+
+    .error {
+      padding: 24px;
+      color: #9b3030
+    }
+
+    @media(max-width:950px) {
+      .filters {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .grid {
+        grid-template-columns: 1fr
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .programgrid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:570px) {
+      header {
+        padding: 17px 18px
+      }
+
+      header small {
+        display: none
+      }
+
+      main {
+        padding: 20px 14px
+      }
+
+      .heading {
+        display: block
+      }
+
+      .filters {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .filters .wide {
+        grid-column: 1/-1
+      }
+
+      .metrics {
+        gap: 8px
+      }
+
+      .metric {
+        padding: 14px
+      }
+
+      .metric strong {
+        font-size: 23px
+      }
+
+      .programgrid {
+        grid-template-columns: 1fr
+      }
+
+      .panel {
+        padding: 17px
+      }
+    }
+
+    .editgrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px
+    }
+
+    .editgrid label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px
+    }
+
+    .editgrid input,
+    .editgrid select,
+    .editgrid textarea {
+      width: 100%;
+      border: 1px solid #c9d6e3;
+      border-radius: 8px;
+      padding: 9px;
+      color: #172941;
+      background: white
+    }
+
+    .editgrid textarea {
+      min-height: 110px;
+      resize: vertical
+    }
+
+    .editgrid .spanall {
+      grid-column: 1/-1
+    }
+
+    .editactions {
+      display: flex;
+      gap: 9px;
+      margin-top: 14px
+    }
+
+    .primary {
+      border: 0;
+      border-radius: 8px;
+      background: #153d68;
+      color: white;
+      padding: 10px 15px
+    }
+
+    .recordactions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px
+    }
+
+    .recordactions button {
+      font-size: 13px
+    }
+
+    .adminrow {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 18px 0
+    }
+
+    .adminrow input {
+      max-width: 330px
+    }
+
+    .warning {
+      color: #a33838
+    }
+
+    .chart rect[data-year] {
+      cursor: pointer
+    }
+
+    .chart rect[data-year]:hover {
+      opacity: .72
+    }
+
+    #message {
+      min-height: 20px;
+      font-size: 14px
+    }
+
+    @media(max-width:650px) {
+      .editgrid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .editgrid .spanall {
+        grid-column: 1/-1
+      }
+    }
+
+    .peopleTable th:first-child {
+      position: sticky;
+      left: 0;
+      background: #eef3f8;
+      min-width: 190px;
+      z-index: 1
+    }
+
+    .peopleTable td {
+      text-align: center;
+      min-width: 55px
+    }
+
+    .peopleTable thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2
+    }
+
+    .peopleTable thead th:first-child {
+      z-index: 3
+    }
+
+    .searchMore {
+      grid-column: 1/-1;
+      font-size: 14px;
+      color: #355d81
+    }
+
+    .searchMore summary {
+      cursor: pointer
+    }
+
+    .searchMore input {
+      width: 100%;
+      max-width: 410px;
+      height: 40px;
+      border: 1px solid #c9d6e3;
+      border-radius: 8px;
+      padding: 0 10px;
+      margin-top: 9px
+    }
+
+    .extraFilters {
+      grid-template-columns: repeat(4, minmax(0, 1fr))
+    }
+
+    .extraFilters select {
+      width: 100%
+    }
+
+    .chipnote {
+      font-size: 13px;
+      color: #64788c;
+      margin: 8px 0
+    }
+
+    @media(max-width:950px) {
+      .extraFilters {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:570px) {
+      .extraFilters {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .filters {
+      grid-template-columns: 120px 120px minmax(170px, 230px) minmax(150px, 200px) auto
+    }
+
+    .filters .wide {
+      grid-column: auto
+    }
+
+    .pickbutton {
+      max-width: 230px
+    }
+
+    .extraFilters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px
+    }
+
+    .extraFilters label,
+    .auditFilters label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px
+    }
+
+    .extraFilters input,
+    .extraFilters select,
+    .auditFilters input,
+    .auditFilters select,
+    .analysisControls select {
+      height: 40px;
+      border: 1px solid #c9d6e3;
+      border-radius: 8px;
+      padding: 0 10px;
+      background: white;
+      max-width: 100%
+    }
+
+    .auditFilters {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px
+    }
+
+    .analysisControls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0
+    }
+
+    .vizbars {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px
+    }
+
+    .vizrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 14px
+    }
+
+    .vizrow>span:first-child {
+      min-width: 95px
+    }
+
+    .viztrack {
+      background: #e7edf4;
+      border-radius: 5px;
+      height: 18px;
+      flex: 1;
+      overflow: hidden
+    }
+
+    .vizfill {
+      height: 100%;
+      background: #176ca8
+    }
+
+    .tablewrap {
+      overflow: auto
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%
+    }
+
+    td,
+    th {
+      text-align: left;
+      border-bottom: 1px solid #e5ebf2;
+      padding: 10px;
+      font-size: 14px
+    }
+
+    th {
+      background: #eef3f8
+    }
+
+    .soft {
+      color: #64788c
+    }
+
+    .chartType {
+      margin-left: auto
+    }
+
+    .compareGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px
+    }
+
+    .recordactions {
+      margin-top: 10px
+    }
+
+    .recordactions details {
+      display: inline-block
+    }
+
+    .recordactions summary {
+      cursor: pointer;
+      color: #355d81;
+      font-size: 13px
+    }
+
+    .recordactions button {
+      margin: 8px 8px 0 0
+    }
+
+    .auditPanel {
+      margin-top: 15px
+    }
+
+    .auditPanel[hidden],
+    .programbox[hidden] {
+      display: none
+    }
+
+    dialog {
+      border: 1px solid #ccd9e6;
+      border-radius: 12px;
+      max-width: min(520px, 92vw);
+      padding: 22px;
+      box-shadow: 0 16px 55px #10264240
+    }
+
+    dialog::backdrop {
+      background: #0c1c31a6
+    }
+
+    dialog pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 260px;
+      overflow: auto
+    }
+
+    dialog input {
+      width: 100%;
+      padding: 8px;
+      margin: 7px 0;
+      border: 1px solid #adc0d1;
+      border-radius: 7px
+    }
+
+    @media(max-width:950px) {
+      .filters {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .extraFilters {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .auditFilters {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:570px) {
+
+      .extraFilters,
+      .auditFilters,
+      .compareGrid,
+      .vizbars {
+        grid-template-columns: 1fr
+      }
+
+      .filters .wide {
+        grid-column: 1/-1
+      }
+    }
+
+    .analysisNav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #e2eaf2;
+      padding-bottom: 13px;
+      margin: 13px 0 18px
+    }
+
+    .analysisNav button {
+      padding: 10px 15px;
+      border-radius: 9px;
+      border: 1px solid #c9d6e3;
+      background: white;
+      color: #26425e
+    }
+
+    .analysisNav button.active {
+      background: #153d68;
+      color: white;
+      border-color: #153d68
+    }
+
+    #analysisHeading {
+      margin: 0 0 16px;
+      font-size: 18px
+    }
+
+    .insightCards,
+    .periodCompare,
+    .qualityTiles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 13px 0 18px
+    }
+
+    .insightCards>div,
+    .periodCompare>div,
+    .qualityTiles>button {
+      border: 1px solid #dae5ef;
+      background: #f7fafc;
+      padding: 13px;
+      border-radius: 9px;
+      text-align: left
+    }
+
+    .insightCards span,
+    .periodCompare span,
+    .qualityTiles span {
+      display: block;
+      font-size: 13px;
+      color: #60768a
+    }
+
+    .insightCards strong,
+    .periodCompare strong,
+    .qualityTiles strong {
+      display: block;
+      font-size: 22px;
+      margin: 4px 0
+    }
+
+    .insightCards small,
+    .periodCompare small {
+      display: block;
+      color: #63798d
+    }
+
+    .analysisSplit {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 20px
+    }
+
+    .analysisSplit h3 {
+      font-size: 16px;
+      margin: 8px 0
+    }
+
+    .insightChart svg {
+      min-width: 650px
+    }
+
+    .composition {
+      max-height: 260px;
+      overflow: auto
+    }
+
+    .mixrow {
+      display: grid;
+      grid-template-columns: 58px 1fr 35px;
+      gap: 8px;
+      align-items: center;
+      margin: 8px 0;
+      font-size: 14px
+    }
+
+    .mixtrack {
+      display: flex;
+      height: 18px;
+      border-radius: 5px;
+      background: #e7edf3;
+      overflow: hidden
+    }
+
+    .mixtrack span {
+      height: 100%
+    }
+
+    .analysisDetails {
+      margin-top: 20px;
+      border-top: 1px solid #e2eaf2;
+      padding-top: 15px
+    }
+
+    .analysisDetails summary {
+      cursor: pointer;
+      color: #155d9c;
+      font-weight: 600
+    }
+
+    .periodInputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+      margin: 15px 0
+    }
+
+    .periodInputs label {
+      font-size: 13px
+    }
+
+    .periodInputs select,
+    .analysisDetails select {
+      display: block;
+      width: 100%;
+      height: 39px;
+      border: 1px solid #c9d6e3;
+      border-radius: 7px;
+      padding: 0 8px;
+      margin-top: 5px;
+      background: white
+    }
+
+    .ranking {
+      max-height: 315px;
+      overflow: auto
+    }
+
+    .rankrow {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) 2fr 35px;
+      align-items: center;
+      gap: 8px;
+      margin: 9px 0;
+      font-size: 13px
+    }
+
+    .rankrow>span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ranktrack {
+      height: 14px;
+      background: #e8eef4;
+      border-radius: 4px
+    }
+
+    .ranktrack i {
+      display: block;
+      height: 100%;
+      background: #2776ab;
+      border-radius: 4px
+    }
+
+    .qualityTiles>button {
+      cursor: pointer
+    }
+
+    .qualityTiles>button.active {
+      border-color: #1c659c;
+      background: #eaf3fa
+    }
+
+    .networkChart svg {
+      min-width: 550px;
+      height: 340px
+    }
+
+    @media(max-width:950px) {
+      .analysisSplit {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+
+      .insightCards,
+      .periodCompare,
+      .qualityTiles {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .periodInputs {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .rankrow {
+        grid-template-columns: 100px 1fr 30px
+      }
+    }
+
+    .field .option input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      padding: 0;
+      margin: 2px 12px 0 0
+    }
+
     html,
     body {
       max-width: 100%;
