@@ -13,3 +13,37 @@ main{max-width:1228px;margin:auto;padding:28px 24px 70px}.heading{margin-bottom:
 @media(max-width:950px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.filters .wide{grid-column:1/-1}.filters #reset{grid-column:1/-1}.grid,.analysisSplit{grid-template-columns:minmax(0,1fr)}.auditFilters{grid-template-columns:repeat(2,minmax(0,1fr))}.extraFilters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){header{padding:14px 16px}header small{display:none}main{padding:19px 14px 50px}.panel{padding:16px}.pageNav{margin-bottom:12px}.finderResults{grid-template-columns:minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{padding:12px}.metric strong{font-size:23px}.extraFilters,.auditFilters,.programgrid,.editgrid,.vizbars{grid-template-columns:minmax(0,1fr)}.insightCards,.periodCompare,.qualityTiles,.periodInputs{grid-template-columns:repeat(2,minmax(0,1fr))}.rankrow{grid-template-columns:90px minmax(0,1fr) 30px}.manageSection>summary{align-items:start;flex-direction:column}.manageSection>summary:before{display:none}.listtop input{width:100%}.finderControls input{min-width:0}}
 @media(max-width:380px){.insightCards,.periodCompare,.qualityTiles{grid-template-columns:minmax(0,1fr)}}
+
+/* CoC mascot palette and navigation that stays within reach while scrolling. */
+:root{color:#1d3448;background:#f3f8f8;--coc-navy:#183b59;--coc-teal:#1a9099;--coc-red:#c8495c;--coc-border:#d6e5e6}
+.brandSlash{color:#73d4d0}
+header{background:var(--coc-navy)}
+.panel,.filters,.metric,.advancedWrap,.manageSection{border-color:var(--coc-border)}
+.finderPanel{border-color:#b8dddc;background:linear-gradient(140deg,#fff,#eefafa)}
+.primary,.chip.active,.analysisNav button.active{background:var(--coc-navy);border-color:var(--coc-navy)}
+.linkbutton,.finderPerson summary,.searchMore summary,.analysisDetails summary{color:#116c78}
+.tag{background:#e7f5f4;color:#145d68}
+.ranktrack i,.vizfill{background:var(--coc-teal)}
+.finderTopics button:hover,.pageNav a:hover{background:#e6f5f4}
+.cozyTip,.cozyNote{display:flex;align-items:center;gap:14px;border:1px solid #b8dddd;background:#f3fbfa;border-radius:14px;color:#22485a}
+.cozyTip{padding:7px 18px 7px 8px;margin:0 0 18px;max-width:730px}
+.cozyTip img,.cozyNote img{display:block;flex:none;object-fit:contain;mix-blend-mode:multiply}
+.cozyTip strong,.cozyNote strong{color:#136f79}
+.cozyTip p,.cozyNote p{margin:3px 0;line-height:1.5;font-size:13px}
+.cozyNote{max-width:660px;padding:7px 12px;margin:9px 0}
+.navToggle{display:none}
+.pageNav{position:fixed;z-index:30;top:96px;left:14px;width:152px;display:flex;flex-direction:column;gap:4px;margin:0;padding:12px;background:#fff;border:1px solid var(--coc-border);border-radius:14px;box-shadow:0 10px 30px #183b5918;max-height:calc(100dvh - 112px);overflow-y:auto}
+.pageNav .navTitle{font-size:12px;font-weight:700;color:#607b85;padding:4px 10px 7px}
+.pageNav a{display:block;white-space:normal;color:#245064;padding:10px;border-radius:9px;font-weight:600;line-height:1.35}
+.pageNav a[aria-current="location"]{background:#dff3f1;color:#115e69;box-shadow:inset 3px 0 var(--coc-teal)}
+main{max-width:1450px;padding-left:190px;padding-right:28px}
+#facultyFinder,#overview,#analytics,#publications,#manage{scroll-margin-top:18px}
+@media(max-width:1100px){
+  main{max-width:1228px;margin:auto;padding-left:24px;padding-right:24px}
+  .navToggle{position:fixed;z-index:32;left:8px;top:88px;display:flex;align-items:center;gap:5px;border:1px solid #a8cece;border-radius:0 11px 11px 0;background:#fff;color:var(--coc-navy);box-shadow:0 6px 24px #183b5933;padding:9px 10px;font-weight:700}
+  .pageNav{top:134px;left:8px;width:185px;transform:translateX(calc(-100% - 16px));opacity:0;visibility:hidden;transition:transform .18s ease,opacity .18s ease,visibility .18s}
+  .pageNav.is-open{transform:translateX(0);opacity:1;visibility:visible}
+  .navToggle[aria-expanded="true"]{background:var(--coc-navy);color:#fff}
+}
+@media(max-width:620px){main{padding:19px 14px 50px}.navToggle{top:auto;bottom:18px;left:12px;border-radius:24px;padding:10px 14px}.pageNav{top:auto;bottom:70px;left:12px;max-height:min(65dvh,420px)}.cozyTip{gap:8px}.cozyTip img{width:58px;height:58px}.cozyNote img{width:35px;height:35px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pageNav{transition:none}}
