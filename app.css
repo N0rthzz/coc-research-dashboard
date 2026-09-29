@@ -15,8 +15,8 @@ main{max-width:1228px;margin:auto;padding:28px 24px 70px}.heading{margin-bottom:
 @media(max-width:380px){.insightCards,.periodCompare,.qualityTiles{grid-template-columns:minmax(0,1fr)}}
 
 /* CoC mascot palette and navigation that stays within reach while scrolling. */
-:root{color:#1d3448;background:#f3f8f8;--coc-navy:#183b59;--coc-teal:#1a9099;--coc-red:#c8495c;--coc-border:#d6e5e6}
-.brandSlash{color:#73d4d0}
+:root{color:#1d3448;background:#f6f8fa;--coc-navy:#243c59;--coc-teal:#2563a6;--coc-border:#dce4e8}
+.brandSlash{color:#b6d7f2}
 header{background:var(--coc-navy)}
 .panel,.filters,.metric,.advancedWrap,.manageSection{border-color:var(--coc-border)}
 .finderPanel{border-color:#b8dddc;background:linear-gradient(140deg,#fff,#eefafa)}
@@ -111,3 +111,24 @@ th,.peopleTable th:first-child{background:#f1f5f6;color:#243d49}
   .metric strong{font-size:26px}
   .cozyTip p,.cozyNote p{font-size:13px}
 }
+
+/* Data colours use blue, green, violet, gold and slate. Red is reserved for errors and destructive actions. */
+:root{background:#f8fafb;--coc-navy:#243c59;--coc-teal:#2563a6;--coc-border:#dde5e9}
+header{background:#243c59}
+.panel,.filters,.metric,.advancedWrap,.manageSection{border-color:var(--coc-border)}
+.finderPanel{background:#fff;border-color:var(--coc-border)}
+.quiet,.chip,.analysisNav button,.finderTopics button,.pager button{background:#fff;color:#24465e;border-color:#cbd8e0}
+.primary,.chip.active,.analysisNav button.active{background:#245580;border-color:#245580;color:#fff}
+.chip.active:hover,.analysisNav button.active:hover,.primary:hover{background:#1d486f}
+.linkbutton,.finderPerson summary,.searchMore summary,.analysisDetails summary{color:#245d93}
+.finderTopics button:hover,.pageNav a:hover{background:#f0f5f9}
+.pageNav a[aria-current="location"]{background:#e9f1f9;color:#1b4a75;box-shadow:inset 3px 0 #3976af}
+.cozyTip,.cozyNote{background:#f5f8fb;border-color:#dce6ec;color:#30495b}
+.cozyTip strong,.cozyNote strong{color:#245580}
+.tag{background:#edf2f6;color:#294e68}
+.qualityTiles>button.active{background:#edf4fa;border-color:#3976af}
+.ranktrack i,.vizfill{background:#2563a6}
+.ranktrack,.viztrack,.mixtrack{background:#e9eef2}
+.metric strong{color:#203d57}
+.legend{color:#344c5c}
+.navToggle{border-color:#b8cad8}
