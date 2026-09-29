@@ -157,7 +157,7 @@ class Handler(SimpleHTTPRequestHandler):
                 results.reverse()
                 return self.respond(200, {"total": len(results), "page": page,
                                           "items": results[(page-1)*25:page*25]})
-        if path not in {"/", "/index.html", "/app.css", "/enhance.js", "/analytics.js", "/finder.js", "/cozy.png"}:
+        if path not in {"/", "/index.html", "/app.css", "/enhance.js", "/analytics.js", "/finder.js", "/i18n.js", "/cozy.png"}:
             return self.respond(404, {"error": "ไม่พบข้อมูล"})
         return super().do_GET()
 
