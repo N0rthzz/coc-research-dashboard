@@ -34,9 +34,12 @@
     'งานประชุมวิชาการ': 'Conference papers', 'จำนวนผลงานในแต่ละปี': 'Publications by year',
     'นับผลงานแต่ละเรื่องหนึ่งครั้งในช่วงปีที่เลือก': 'Each publication is counted once in the selected years.',
     'ยอดรวม': 'Total', 'แยกประเภท': 'By type', 'แยกหลักสูตร': 'By program',
-    'รูปแบบกราฟ': 'Chart style', 'แท่ง': 'Bars', 'เส้น': 'Lines', 'พื้นที่ซ้อน': 'Stacked area',
+    'รูปแบบกราฟ': 'Chart style', 'แท่ง': 'Bars', 'แท่งซ้อน': 'Stacked bars', 'สัดส่วน 100%': '100% stacked', 'เส้น': 'Lines', 'พื้นที่ซ้อน': 'Stacked area',
     'ดาวน์โหลด SVG': 'Download SVG', 'ดาวน์โหลดรายงาน CSV': 'Download CSV report',
     'กดจุดหรือช่วงปีในกราฟเพื่อดูรายการของปีนั้น': 'Select a year in the chart to see its publications.',
+    'กดจุดหรือส่วนสีในกราฟเพื่อดูรายการของปีนั้น': 'Select a point or coloured segment to see that year’s publications.',
+    'แต่ละแท่งรวม 100% เพื่อเทียบสัดส่วนประเภทระหว่างปี · กดส่วนสีเพื่อดูรายการปีนั้น': 'Each bar totals 100% so you can compare the type mix across years. Select a segment to see its publications.',
+    'แต่ละแท่งรวม 100% จากยอดของหลักสูตรที่เกี่ยวข้อง ผลงานร่วมอาจถูกนับในหลายหลักสูตร · กดส่วนสีเพื่อดูรายการปีนั้น': 'Each bar totals 100% of program counts. Joint works may count in several programs. Select a segment to see its publications.',
     'สัดส่วนประเภทผลงาน': 'Publication types',
     'คำนวณจากผลงานที่ไม่ซ้ำตามตัวกรอง': 'Based on unique publications matching the filters.',
     'มุมวิเคราะห์': 'Explore the data',
@@ -96,6 +99,12 @@
     'ยอดตามหลักสูตร': 'Totals by program', 'จำนวนรายปี': 'Yearly counts',
     'ผลงานร่วมอยู่ในยอดของแต่ละอาจารย์หรือหลักสูตรที่เกี่ยวข้อง': 'Joint work counts for each participating lecturer or program.',
     'ดูไทม์ไลน์รายอาจารย์': 'View a lecturer timeline',
+    'Heatmap: อาจารย์ × ปี': 'Heatmap: lecturers × year',
+    'Heatmap: หลักสูตร × ปี': 'Heatmap: programs × year',
+    'สีเข้มหมายถึงผลงานมาก กดช่องที่มีตัวเลขเพื่อดูรายการจริงของปีนั้น': 'Darker cells indicate more publications. Select a numbered cell to see that year’s entries.',
+    'จำนวนผลงานต่อปี': 'Publications per year',
+    'ระดับสีของจำนวนผลงาน': 'Publication count colour scale',
+    'ไม่มีผลงาน': 'No publications',
     'เลือกอาจารย์': 'Select lecturer',
     '“ยังไม่ระบุ” คือผลงานของอาจารย์ที่ยังไม่ได้จับคู่หลักสูตร': '“Unassigned” refers to lecturers without a mapped program.',
     'ไม่มีผลงานในช่วงที่เลือก': 'No publications in the selected years.',
@@ -135,7 +144,7 @@
     if (result === undefined) {
       result = trimmed;
       if (/^(25|26)\d{2}$/.test(trimmed) && element?.closest('#from,#to,#chart,#analysisContent,#finderResults,#drillLabel')) result = year(trimmed);
-      else if (/^(25|26)\d{2} \/ \d{1,2}$/.test(trimmed)) result = year(trimmed.slice(0, 4)) + trimmed.slice(4);
+      else if (/^(25|26)\d{2} \/ \d{1,2}$/.test(trimmed)) result = year(trimmed.slice(0,4)) + trimmed.slice(4);
       else {
         result = result.replace(/พ\.ศ\.\s*((?:25|26)\d{2})/g, (_, n) => year(n));
         result = result.replace(/^หน้า (\d+) \/ (\d+)$/, 'Page $1 / $2')
@@ -149,6 +158,8 @@
           .replace(/^แสดง (\d+) จาก (\d+) รายการ$/, 'Showing $1 of $2 entries')
           .replace(/^แสดง (\d+) รายการจาก (\d+)$/, 'Showing $1 of $2 entries')
           .replace(/^((?:19|20)\d{2}) · (.+): (\d+)$/, (_, y, label, count) => `${y} · ${phrases[label] || label}: ${count}`)
+          .replace(/^((?:19|20)\d{2}) · (.+) · (\d+)% \((\d+) เรื่อง\)$/, (_, y, label, pct, count) => `${y} · ${phrases[label] || label} · ${pct}% (${count} publications)`)
+          .replace(/^(.+) ((?:19|20)\d{2}): (\d+) เรื่อง$/, '$1 $2: $3 publications')
           .replace(/^((?:19|20)\d{2}) · คลิกดูรายการ$/, '$1 · Select to view entries')
           .replace(/^((?:19|20)\d{2}) · (.+)$/, (_, y, label) => `${y} · ${phrases[label] || label}`)
           .replace(/^ค่าเฉลี่ยย้อนหลังถึง ((?:19|20)\d{2}): (.+)$/, 'Rolling average through $1: $2')
@@ -227,9 +238,9 @@
   }
   function select(lang) {
     language = lang;
-    try { localStorage.setItem('coc-language', lang); } catch (_) { }
+    try { localStorage.setItem('coc-language', lang); } catch (_) {}
     apply();
-    if (!document.getElementById('auditPanel').hidden && typeof showAudit === 'function') showAudit().catch(() => { });
+    if (!document.getElementById('auditPanel').hidden && typeof showAudit === 'function') showAudit().catch(() => {});
   }
   document.getElementById('langTH').addEventListener('click', () => select('th'));
   document.getElementById('langEN').addEventListener('click', () => select('en'));
@@ -242,6 +253,6 @@
     for (const node of changed) visit(node);
   });
   observer.observe(document.body, { childList: true, characterData: true, subtree: true });
-  try { language = localStorage.getItem('coc-language') === 'en' ? 'en' : 'th'; } catch (_) { }
+  try { language = localStorage.getItem('coc-language') === 'en' ? 'en' : 'th'; } catch (_) {}
   apply();
 })();
