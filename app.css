@@ -47,3 +47,67 @@ main{max-width:1450px;padding-left:190px;padding-right:28px}
 }
 @media(max-width:620px){main{padding:19px 14px 50px}.navToggle{top:auto;bottom:18px;left:12px;border-radius:24px;padding:10px 14px}.pageNav{top:auto;bottom:70px;left:12px;max-height:min(65dvh,420px)}.cozyTip{gap:8px}.cozyTip img{width:58px;height:58px}.cozyNote img{width:35px;height:35px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.pageNav{transition:none}}
+
+/* Reading hierarchy: calm surfaces, clear text, and enough room for Thai labels. */
+:root{font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;color:#192b38;background:#f7f9fa;font-size:15px;line-height:1.55}
+body{line-height:1.55}
+main{padding-top:32px}
+header{background:#203a4e;padding-top:18px;padding-bottom:18px}
+header strong{font-size:18px;letter-spacing:.01em}
+header small{font-size:13px;color:#edf4f6}
+.heading{margin-bottom:23px}
+.heading h1{font-size:clamp(26px,2.8vw,34px);font-weight:700;line-height:1.32;letter-spacing:-.02em}
+.heading p{font-size:15px;line-height:1.6;color:#435966;margin-top:7px}
+.panel,.filters,.metric,.advancedWrap,.manageSection{border-color:#dce4e8;border-radius:12px;box-shadow:0 2px 10px #19364708}
+.panel{padding:24px}
+.panel h2{font-size:21px;line-height:1.4;margin-bottom:7px;color:#192b38}
+.panel h3{line-height:1.45}
+.hint,.note,.chipnote,.muted,.soft{color:#4c6370}
+.hint,.note,.chipnote{font-size:14px;line-height:1.7}
+.hint{margin:5px 0 14px}
+.finderPanel{background:#fff;border-color:#d8e5e8}
+.cozyTip,.cozyNote{background:#f2f8f8;border-color:#cee2e2;color:#304f58}
+.cozyTip p,.cozyNote p{font-size:14px;line-height:1.6}
+.pageNav{border-color:#dce4e8;box-shadow:0 6px 24px #19364712}
+.pageNav .navTitle{font-size:13px;color:#49616e}
+.pageNav a{font-size:15px;color:#283f4b;font-weight:500;padding:11px 12px}
+.pageNav a[aria-current="location"]{background:#e9f4f3;color:#164d55}
+.field label,.field>span,.extraFilters label,.auditFilters label,.periodInputs label,.editgrid label,.programitem{font-size:14px;color:#253e4b}
+.field select,.field input,.pickbutton,.extraFilters input,.extraFilters select,.auditFilters input,.auditFilters select,.editgrid input,.editgrid select,.analysisControls select,.periodInputs select,.analysisDetails select,.finderControls input,.listtop input{font-size:15px;color:#192b38;min-height:44px;border-color:#c9d5dc}
+.field select,.field input,.pickbutton{height:44px}
+.field .option input[type=checkbox]{min-height:17px}
+.field .option{font-size:14px}
+.option{font-size:14px;line-height:1.5}
+.quiet,.primary,.chip,.analysisNav button,.finderTopics button,.pager button,.linkbutton{font-size:14px;line-height:1.45}
+.quiet,.primary{min-height:42px}
+.chip,.analysisNav button{padding:9px 13px}
+.analysisNav{gap:9px;margin:17px 0 20px}
+#analysisHeading{font-size:19px}
+.metrics{gap:12px;margin:22px 0}
+.metric{padding:18px}
+.metric span{font-size:14px;color:#49616e;line-height:1.45}
+.metric strong{font-size:30px;line-height:1.2;color:#1a3b50}
+.finderPerson{padding:17px;border-color:#dce4e8}
+.finderPerson h3{font-size:16px}
+.finderPerson p,.finderPerson li,.finderPerson li small{font-size:14px;line-height:1.65;color:#465e6b}
+.record{padding:17px 0}
+.record h3{font-size:16px;line-height:1.65;color:#21343f}
+.record small,.recordactions summary,.tag{font-size:13px;line-height:1.6}
+.tag{background:#edf5f5;color:#225a63}
+.legend,.mixrow,.rankrow,.vizrow,td,th{font-size:14px;color:#344b58}
+td,th{padding:11px 12px;line-height:1.5}
+th,.peopleTable th:first-child{background:#f1f5f6;color:#243d49}
+.insightCards span,.periodCompare span,.qualityTiles span,.insightCards small,.periodCompare small{font-size:13px;color:#4c6370;line-height:1.5}
+.insightCards>div,.periodCompare>div,.qualityTiles>button{background:#f9fbfb;border-color:#dce5e8;padding:15px}
+.analysisDetails summary,.manageSection>summary,.advancedWrap>summary{font-size:15px;color:#244f5b}
+.manageSection>summary small{font-size:13px;color:#4c6370}
+.chart svg text,.insightChart svg text,.networkChart svg text{font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:13px}
+@media(max-width:620px){
+  main{padding:22px 14px 86px}
+  .panel{padding:18px}
+  .heading h1{font-size:26px}
+  .panel h2{font-size:19px}
+  .metric{padding:15px}
+  .metric strong{font-size:26px}
+  .cozyTip p,.cozyNote p{font-size:13px}
+}
