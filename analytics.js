@@ -52,6 +52,7 @@ function svgChart(rows) {
   const left = 49, right = 16, top = 32, base = 248;
   const step = (width - left - right) / years.length, barWidth = Math.min(36, step * .66);
   const yCoord = value => base - (base - top) * value / max;
+  let valueLabels = '';
   let svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="กราฟผลงานตามปี">`;
   for (let tick = 0; tick <= 4; tick++) {
     const y = yCoord(max * tick / 4);
@@ -73,9 +74,10 @@ function svgChart(rows) {
         const detail = percent ? ` · ${Math.round(n * 100 / sum)}% (${n} เรื่อง)` : `: ${n}`;
         svg += `<rect data-year="${years[i]}" x="${x-barWidth/2}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${COLORS[j%COLORS.length]}">`
           + `<title>พ.ศ. ${years[i]+543} · ${LABELS[cats[j]] || cats[j]}${detail}</title></rect>`;
-        if (barHeight >= 21 && mode !== 'total') svg += `<text data-year="${years[i]}" x="${x}" y="${y+barHeight/2+4}" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">${percent?Math.round(n*100/sum)+'%':n}</text>`;
+        if (barHeight >= 21 && mode !== 'total') valueLabels += `<text class="chartSegmentLabel" data-year="${years[i]}" x="${x}" y="${y+barHeight/2+4}" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">${percent?Math.round(n*100/sum)+'%':n}</text>`;
       });
-      if (!percent) svg += `<text data-year="${years[i]}" x="${x}" y="${Math.max(16,yCoord(sum)-8)}" text-anchor="middle" fill="#263d4c" font-size="12" font-weight="700">${sum}</text>`;
+      const totalY = percent && sum ? top - 10 : yCoord(sum) - 10;
+      valueLabels += `<text class="chartValueLabel" data-label="total" data-year="${years[i]}" x="${x}" y="${Math.max(18,totalY)}" text-anchor="middle" fill="#263d4c" font-size="15" font-weight="700" stroke="#fff" stroke-width="3" paint-order="stroke fill">${sum}</text>`;
     }
   });
   if (chartStyle === 'line') cats.forEach((cat, j) => {
@@ -97,7 +99,8 @@ function svgChart(rows) {
       svg += `<rect data-year="${years[i]}" x="${x-step/2}" y="${top}" width="${step}" height="${base-top}" fill="transparent"><title>พ.ศ. ${years[i]+543} · คลิกดูรายการ</title></rect>`;
     });
   }
-  $('chart').innerHTML = svg + '</svg>';
+  // Paint labels last so later chart geometry cannot cover the numbers.
+  $('chart').innerHTML = svg + valueLabels + '</svg>';
   $('legend').innerHTML = mode === 'total' ? '' : cats.map((cat, i) => `<span style="--color:${COLORS[i%COLORS.length]}">${LABELS[cat] || cat}</span>`).join('');
   $('chartHelp').textContent = percent
     ? mode === 'program'

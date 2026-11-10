@@ -2,6 +2,24 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 
+// Totals must remain visible above bars, including 100% and empty years.
+const chartNodes={from:{value:'2024'},to:{value:'2025'},chart:{},legend:{},chartHelp:{}};
+const chartContext={$:id=>chartNodes[id],mode:'total',chartStyle:'bar',TYPES:['Journal','Proceedings'],
+  PROGRAMS:['Comp','DE'],COLORS:['#16858d','#b52324'],LABELS:{},
+  hasProgram:()=>true,unique:rows=>[...new Map(rows.map(row=>[row.key,row])).values()]};
+vm.createContext(chartContext);
+const chartSource=fs.readFileSync('analytics.js','utf8');
+vm.runInContext(chartSource.slice(chartSource.indexOf('function svgChart(rows)'),chartSource.indexOf('drawBarChart=svgChart')),chartContext);
+for(const style of ['bar','percent'])for(const mode of ['total','type','program']){
+  chartContext.chartStyle=style;chartContext.mode=mode;
+  chartContext.svgChart([{key:'a',year:2025,type:'Journal',staff:'Alice'}]);
+  const svg=chartNodes.chart.innerHTML;
+  assert.equal((svg.match(/data-label="total"/g)||[]).length,2);
+  assert.ok(!svg.includes('NaN'));
+  assert.ok(svg.lastIndexOf('data-label="total"')>svg.lastIndexOf('</rect>'));
+  assert.ok(/data-label="total"[^>]*>0<\/text>/.test(svg));
+}
+
 // Exercise language switching, including dynamic period text and restoration.
 const buttons={};
 const element={closest:()=>null};
