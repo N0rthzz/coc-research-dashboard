@@ -76,9 +76,14 @@ def cache_replace(tab, rows):
         upserts = [r for k, r in new.items() if k not in old or r != old[k]]
         deletes = [k for k in old if k not in new]
         if upserts or deletes:
-            apps_script_request(tab, action="mutate", rows={
-                "upserts": upserts, "deletes": deletes
-            })
+            try:
+                apps_script_request(tab, action="mutate", rows={
+                    "upserts": upserts, "deletes": deletes
+                })
+            except RuntimeError as exc:
+                if str(exc) != "Apps Script: Unsupported action: mutate":
+                    raise
+                apps_script_request(tab, rows)
     with CACHE_LOCK:
         CACHE[tab] = copy.deepcopy(rows)
 
@@ -87,6 +92,63 @@ def cache_append_audit(row):
     apps_script_request(SHEET_AUDIT, [row], action="append")
     with CACHE_LOCK:
         CACHE.setdefault(SHEET_AUDIT, []).append(copy.deepcopy(row))
+
+
+def save_publication_with_audit(rows, action, record_id, before, after):
+    """One Apps Script HTTP request for publication mutation and audit entry."""
+    if STORAGE_BACKEND != "apps_script":
+        save(DATA, rows)
+        event(action, "publication", record_id, before, after)
+        return
+    with CACHE_LOCK:
+        previous = copy.deepcopy(CACHE.get(SHEET_PUBLICATIONS))
+    if previous is None:
+        previous = apps_script_request(SHEET_PUBLICATIONS)
+    # Google Sheets returns display strings, while the Python API uses numeric
+    # id/year/month. Compare normalized records to avoid treating all 717 rows
+    # as modified when only one publication was edited.
+    def canonical(record):
+        normalized = dict(record)
+        for field in ("id", "year", "month"):
+            value = normalized.get(field, "")
+            normalized[field] = int(float(str(value).replace(",", ""))) if str(value).strip() else 0
+        return normalized
+
+    old = {str(r["id"]): canonical(r) for r in previous}
+    new = {str(r["id"]): canonical(r) for r in rows}
+    upserts = [r for k, r in new.items() if k not in old or r != old[k]]
+    deletes = [k for k in old if k not in new]
+    entry = {"seq": len(load_audit()) + 1,
+             "time": datetime.now(timezone.utc).isoformat(), "action": action,
+             "entity": "publication", "id": _audit_cell(record_id),
+             "before": _audit_cell(before), "after": _audit_cell(after), "restore_of": ""}
+    try:
+        apps_script_request(SHEET_PUBLICATIONS, action="mutate_with_audit",
+                            rows={"upserts": upserts, "deletes": deletes, "audit": entry})
+    except RuntimeError as exc:
+        # Older deployments reject this action before writing any data. Only
+        # that explicit response permits retrying with the older protocol;
+        # timeouts or other errors may already have applied the mutation.
+        if str(exc) != "Apps Script: Unsupported action: mutate_with_audit":
+            raise
+        try:
+            apps_script_request(SHEET_PUBLICATIONS, action="mutate",
+                                rows={"upserts": upserts, "deletes": deletes})
+        except RuntimeError as legacy_error:
+            if str(legacy_error) != "Apps Script: Unsupported action: mutate":
+                raise
+            apps_script_request(SHEET_PUBLICATIONS, rows)
+        with CACHE_LOCK:
+            CACHE[SHEET_PUBLICATIONS] = copy.deepcopy(rows)
+        try:
+            apps_script_request(SHEET_AUDIT, [entry], action="append")
+        except Exception as audit_error:
+            raise RuntimeError(
+                "Publication saved, but audit logging failed. Sync Sheets and inspect changes before retrying."
+            ) from audit_error
+    with CACHE_LOCK:
+        CACHE[SHEET_PUBLICATIONS] = copy.deepcopy(rows)
+        CACHE.setdefault(SHEET_AUDIT, []).append(copy.deepcopy(entry))
 
 
 def sync_from_sheets():
@@ -244,11 +306,7 @@ def initialize_apps_script():
             apps_script_request(SHEET_PUBLICATIONS, seed)
             existing = apps_script_request(SHEET_PUBLICATIONS)
     programs = apps_script_request(SHEET_PROGRAMS)
-    try:
-        audit = apps_script_request(SHEET_AUDIT)
-    except TimeoutError as exc:
-        print(f"[WARN] Audit log loading timed out: {exc}", flush=True)
-        audit = []
+    audit = apps_script_request(SHEET_AUDIT)
     with CACHE_LOCK:
         CACHE.update({SHEET_PUBLICATIONS: existing, SHEET_PROGRAMS: programs, SHEET_AUDIT: audit})
     print(f"Apps Script cache ready: {len(existing)} publications, {len(programs)} programs, {len(audit)} audit entries")
@@ -256,7 +314,7 @@ def initialize_apps_script():
 
 LOCK = threading.RLock()
 TYPES = {"International Journal Articles", "International Proceedings", "National Journal Articles", "National Proceedings"}
-PROGRAM_VALUES = {"Comp", "DE", "AISE", "DBiz"}
+PROGRAM_VALUES = {"Comp", "DE", "AISE", "DBiz", "MsComp"}
 
 
 def normalize(value):
@@ -449,9 +507,9 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.respond(200, {"total": len(results), "page": page,
                                               "items": results[(page-1)*25:page*25]})
         except Exception as exc:
-            print(f"[API GET ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
+            print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
-        if path not in {"/", "/index.html", "/app.css", "/enhance.js", "/analytics.js", "/finder.js", "/i18n.js", "/cozy.png"}:
+        if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png"}:
             return self.respond(404, {"error": "ไม่พบข้อมูล"})
         return super().do_GET()
 
@@ -550,8 +608,7 @@ class Handler(SimpleHTTPRequestHandler):
                     rows = load(DATA, [])
                     rec["id"] = next_publication_id(rows)
                     rows.append(rec)
-                    save(DATA, rows)
-                    event("create", "publication", rec["id"], None, rec)
+                    save_publication_with_audit(rows, "create", rec["id"], None, rec)
                     return self.respond(201, rec)
                 if path == "/api/import":
                     candidates = body.get("candidates")
@@ -577,7 +634,10 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.respond(200, {"added": len(added)})
                 if path == "/api/programs":
                     staff, program = normalize(body.get("staff")), body.get("program") or ""
-                    if not staff or program not in PROGRAM_VALUES | {""}:
+                    if not staff or not isinstance(program, str) or any(
+                        part.strip().rstrip("*").strip() not in PROGRAM_VALUES
+                        for part in program.split(",") if program
+                    ):
                         raise ValueError("ชื่ออาจารย์หรือหลักสูตรไม่ถูกต้อง")
                     mapping = load(PROGRAMS, {})
                     before = mapping.get(staff, "")
@@ -593,7 +653,7 @@ class Handler(SimpleHTTPRequestHandler):
         except (ValueError, UnicodeError, json.JSONDecodeError) as e:
             return self.respond(400, {"error": str(e)})
         except Exception as exc:
-            print(f"[API GET ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
+            print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
 
     def do_PUT(self):
@@ -612,19 +672,19 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.respond(404, {"error": "ไม่พบรายการ"})
                 rec = {**payload, "id": old["id"]}
                 rows[rows.index(old)] = rec
-                save(DATA, rows)
-                event("update", "publication", rec["id"], old, rec)
+                save_publication_with_audit(rows, "update", rec["id"], old, rec)
                 return self.respond(200, rec)
         except (ValueError, json.JSONDecodeError) as e:
             return self.respond(400, {"error": str(e)})
         except Exception as exc:
-            print(f"[API GET ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
+            print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
 
     def do_DELETE(self):
         if not self.authorized():
             return
-        match = re.fullmatch(r"/api/publications/(\d+)", urlparse(self.path).path)
+        path = urlparse(self.path).path
+        match = re.fullmatch(r"/api/publications/(\d+)", path)
         if not match:
             return self.respond(404, {"error": "ไม่พบรายการ"})
         try:
@@ -634,15 +694,11 @@ class Handler(SimpleHTTPRequestHandler):
                 if old is None:
                     return self.respond(404, {"error": "ไม่พบรายการ"})
                 rows.remove(old)
-                save(DATA, rows)
-                event("delete", "publication", old["id"], old, None)
+                save_publication_with_audit(rows, "delete", old["id"], old, None)
                 return self.respond(200, {"deleted": old["id"]})
         except Exception as exc:
-            print(
-    f"[API DELETE ERROR] {self.path}: "
-    f"{type(exc).__name__}: {exc}",
-    flush=True
-)
+            print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
+            return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
 
 
 if __name__ == "__main__":

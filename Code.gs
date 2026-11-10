@@ -55,6 +55,48 @@ function doPost(e) {
     try {
       const sheet = getSheet(name), headers = SHEETS[name];
       const toValues = rows => rows.map(r => headers.map(h => r[h] ?? ""));
+      if (action === "mutate_with_audit") {
+        if (name !== "publications") throw new Error("Only publications support mutate_with_audit");
+        const payload = body.rows || {};
+        const upserts = payload.upserts || [], deletes = payload.deletes || [];
+        const audit = payload.audit;
+        if (!Array.isArray(upserts) || !Array.isArray(deletes) || !audit || typeof audit !== "object")
+          throw new Error("Invalid mutation or audit payload");
+        const auditSheet = getSheet("changes");
+        const auditHeaders = SHEETS.changes;
+        const last = sheet.getLastRow();
+        const keys = last > 1 ? sheet.getRange(2, 1, last - 1, 1).getDisplayValues().flat() : [];
+        const positions = new Map();
+        keys.forEach((key, i) => { if (key !== "") positions.set(String(key), i + 2); });
+        const deleteRows = [...new Set(deletes.map(k => positions.get(String(k))).filter(Boolean))].sort((a,b) => b-a);
+        deleteRows.forEach(row => sheet.deleteRow(row));
+        if (deleteRows.length) {
+          positions.clear();
+          const remaining = sheet.getLastRow();
+          if (remaining > 1) sheet.getRange(2, 1, remaining - 1, 1).getDisplayValues().flat()
+            .forEach((key, i) => { if (key !== "") positions.set(String(key), i + 2); });
+        }
+        const additions = [];
+        upserts.forEach(record => {
+          const key = String(record.id);
+          if (!key || key === "undefined") throw new Error("Missing id");
+          const values = SHEETS.publications.map(h => record[h] ?? "");
+          const row = positions.get(key);
+          if (row) sheet.getRange(row, 1, 1, values.length).setValues([values]);
+          else additions.push(values);
+        });
+        if (additions.length) {
+          const start = sheet.getLastRow() + 1;
+          ensureRows(sheet, start + additions.length - 1);
+          sheet.getRange(start, 1, additions.length, SHEETS.publications.length).setValues(additions);
+        }
+        // Append the audit entry in the same HTTP invocation, under the same script lock.
+        const auditRow = auditSheet.getLastRow() + 1;
+        ensureRows(auditSheet, auditRow);
+        auditSheet.getRange(auditRow, 1, 1, auditHeaders.length)
+          .setValues([auditHeaders.map(h => audit[h] ?? "")]);
+        return output({ok: true, updated: upserts.length, deleted: deleteRows.length, audited: 1});
+      }
       if (action === "mutate") {
         if (name !== "publications" && name !== "staff_programs") throw new Error("Mutate unsupported for " + name);
         const payload = body.rows || {}, upserts = payload.upserts || [], deletes = payload.deletes || [];

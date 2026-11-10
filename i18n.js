@@ -132,6 +132,35 @@
     'เช่น Scopus': 'e.g. Scopus'
   };
 
+  Object.assign(phrases, {
+    'Language / ภาษา':'Language',
+    'เดือนเริ่มต้น':'From month','เดือนสิ้นสุด':'To month',
+    'มกราคม':'January','กุมภาพันธ์':'February','มีนาคม':'March','เมษายน':'April',
+    'พฤษภาคม':'May','มิถุนายน':'June','กรกฎาคม':'July','สิงหาคม':'August',
+    'กันยายน':'September','ตุลาคม':'October','พฤศจิกายน':'November','ธันวาคม':'December',
+    'เลือกปีงบประมาณ (พ.ศ.)':'Fiscal year (CE)','เดือนเริ่มปีงบประมาณ':'Fiscal year starts in',
+    'กำหนดช่วงเอง':'Custom period','ช่วงปีงบประมาณ':'Fiscal year period',
+    'ปีงบประมาณใช้ปีที่สิ้นสุดช่วง · รายการที่ไม่ระบุเดือนจะแสดงเฉพาะเมื่อเลือกเต็มปี':'Fiscal years are labelled by the ending year. Entries without a month appear only for full-year ranges.',
+    'กราฟแสดงแยกตามปีปฏิทิน':'Charts use calendar years',
+    'ช่วงเวลาไม่ถูกต้อง: วันเริ่มต้องมาก่อนวันสิ้นสุด':'Invalid period: the start must be before the end.',
+    'ผลงานตามหลักสูตร':'Publications by program',
+    'นับผลงานไม่ซ้ำภายในแต่ละหลักสูตร · ผลงานร่วมอาจอยู่หลายหลักสูตร':'Unique publications within each program. Joint work may count in several programs.',
+    'มุมมอง':'View','สรุปภาพรวม':'Summary','Heatmap ช่วงละ 5 ปี':'Heatmap: 5-year periods',
+    'Heatmap รายปี':'Heatmap: annual','ค้นหาชื่อ':'Search names',
+    'ชื่ออาจารย์หรือหลักสูตร':'Lecturer or program name','แนวโน้มรายปี':'Annual trend',
+    'ไม่พบข้อมูลตามตัวกรอง':'No data matches the selected filters.',
+    'ผลงานร่วมอาจนับในหลายคนหรือหลายหลักสูตร':'Joint work may count for multiple lecturers or programs.',
+    'แต่ละช่องรวมผลงานรายปีในช่วง 5 ปี เริ่มจากปีแรกที่เลือก · สีเข้มหมายถึงผลงานมาก':'Each cell sums annual counts across five years, starting with the first selected year. Darker cells indicate more publications.',
+    'ดาวน์โหลดรูป PNG':'Download PNG image',
+    'ส่งออกทุกรายชื่อและทุกปีตามตัวกรอง รวมส่วนที่ต้องเลื่อนดู':'Export all matching names and years, including content outside the visible area.',
+    'ไม่มีข้อมูลตามตัวกรองสำหรับส่งออก':'No matching data to export',
+    'ตัวเลขด้านบนคือจำนวนผลงาน · กดจุดหรือส่วนสีเพื่อดูรายการของปีนั้น':'Numbers above bars show publication counts. Select a point or segment to see that year’s entries.',
+    'ตัวเลขด้านบนคือผลรวมรายหลักสูตร ผลงานเดียวอาจอยู่หลายหลักสูตร · กดแท่งเพื่อดูรายการปีนั้น':'Numbers above bars sum program counts; joint work may count in several programs. Select a bar to see entries.',
+    'ดึงข้อมูลล่าสุดจาก Google Sheets':'Reload the latest data from Google Sheets',
+    'กำลัง Sync...':'Syncing…','กลุ่ม':'Group','วารสาร':'Journals','ประชุม':'Conferences',
+    'งานประชุม':'Conference papers','รวม':'Total','สัดส่วนวารสาร':'Journal share',
+    'จำนวนจริง':'Publication count'
+  });
   const originals = new WeakMap();
   const lastOutput = new WeakMap();
   let language = 'th';
@@ -143,7 +172,7 @@
     let result = phrases[trimmed];
     if (result === undefined) {
       result = trimmed;
-      if (/^(25|26)\d{2}$/.test(trimmed) && element?.closest('#from,#to,#chart,#analysisContent,#finderResults,#drillLabel')) result = year(trimmed);
+      if (/^(25|26)\d{2}$/.test(trimmed) && element?.closest('#from,#to,#fiscalYear,#chart,#analysisContent,#finderResults,#drillLabel')) result = year(trimmed);
       else if (/^(25|26)\d{2} \/ \d{1,2}$/.test(trimmed)) result = year(trimmed.slice(0,4)) + trimmed.slice(4);
       else {
         result = result.replace(/พ\.ศ\.\s*((?:25|26)\d{2})/g, (_, n) => year(n));
@@ -196,6 +225,22 @@
         }
       }
     }
+    // New controls and dynamic summaries are composed from multiple UI phrases.
+    // Keep source publication text excluded by skip(), and preserve staff names.
+    if (/[\u0e00-\u0e7f]/.test(result)) {
+      result=result.replace(/^หน้า (\d+) \/ (\d+) · แสดงครั้งละ (\d+) รายชื่อ$/, 'Page $1 / $2 · $3 names per page')
+        .replace(/^(\d+) อาจารย์$/, '$1 lecturers').replace(/^(\d+) หลักสูตร$/, '$1 programs')
+        .replace(/^กดดูผลงาน /,'View publications by ')
+        .replace(/: (\d+) ผลงาน กดเพื่อกรอง$/,': $1 publications; select to filter')
+        .replace(/^แนวโน้มรายปี /,'Annual trend ');
+      for(const phrase of [
+        'ผลงานร่วมอาจนับในหลายคนหรือหลายหลักสูตร','กราฟแสดงแยกตามปีปฏิทิน',
+        'มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'
+      ]) result=result.split(phrase).join(phrases[phrase]);
+    }
+    if(element?.closest('#periodStatus,.peopleOverviewNote,.groupedHeatTable thead,#analysisContent .heatTable thead')) {
+      result=result.replace(/\b(?:25|26)\d{2}\b/g,n=>year(n)).replace(/พ\.ศ\.\s*/g,'');
+    }
     if (result === trimmed) return text;
     return text.replace(trimmed, result);
   }
@@ -242,6 +287,7 @@
     apply();
     if (!document.getElementById('auditPanel').hidden && typeof showAudit === 'function') showAudit().catch(() => {});
   }
+  window.cocTranslate=(text,element)=>language==='en'?translate(String(text),element):String(text);
   document.getElementById('langTH').addEventListener('click', () => select('th'));
   document.getElementById('langEN').addEventListener('click', () => select('en'));
   const observer = new MutationObserver(records => {
