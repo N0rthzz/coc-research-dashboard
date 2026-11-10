@@ -3,6 +3,8 @@ import threading
 import unittest
 from pathlib import Path
 from urllib.request import urlopen
+from urllib.parse import urlsplit
+import hashlib
 from unittest.mock import patch
 
 import server
@@ -23,7 +25,10 @@ class StaticAssetTests(unittest.TestCase):
                     with self.subTest(asset=asset):
                         with urlopen(f"http://127.0.0.1:{httpd.server_port}/{asset}") as response:
                             self.assertEqual(response.status, 200)
-                            self.assertEqual(response.read(), (server.ROOT / asset).read_bytes())
+                            contents = (server.ROOT / urlsplit(asset).path).read_bytes()
+                            self.assertEqual(response.read(), contents)
+                            self.assertEqual(response.headers.get("Cache-Control"), "no-cache")
+                            self.assertEqual(urlsplit(asset).query, "v=" + hashlib.sha256(contents.replace(b'\r\n', b'\n')).hexdigest()[:12])
             finally:
                 httpd.shutdown()
                 httpd.server_close()

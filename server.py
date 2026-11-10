@@ -447,6 +447,12 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
+    def end_headers(self):
+        if getattr(self, "_serving_static", False):
+            # Revalidate UI files after deployments; API/auth retain no-store.
+            self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
+
     def respond(self, code, payload):
         b = json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(code)
@@ -475,6 +481,7 @@ class Handler(SimpleHTTPRequestHandler):
         return self.rfile.read(length)
 
     def do_GET(self):
+        self._serving_static = False
         if not self.authorized():
             return
         path = urlparse(self.path).path
@@ -511,6 +518,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
         if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png"}:
             return self.respond(404, {"error": "ไม่พบข้อมูล"})
+        self._serving_static = True
         return super().do_GET()
 
     def do_POST(self):
