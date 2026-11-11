@@ -1,0 +1,54 @@
+/* Theme tokens cover nested surfaces as well as the page background. */
+html[data-theme=dark]{
+  color-scheme:dark;--page:#111a23;--surface:#1c2935;--raised:#253544;
+  --theme-ink:#ecf2f7;--theme-muted:#b7c6d3;--theme-line:#45596b;
+  --accent:#7edbd5;--active:#245452;--active-ink:#edfffd;--track:#384b5c;
+  --grid:#405365;--focus:#9cebe5;--warning:#ffb5ae;
+  --heat0:#253544;--heat1:#264c50;--heat2:#316b6a;--heat3:#478d84;--heat4:#8bd9c7;
+}
+html[data-theme=cozy]{
+  color-scheme:light;--page:#eee1cf;--surface:#faf1e3;--raised:#f1e3cf;
+  --theme-ink:#44372d;--theme-muted:#6f5b49;--theme-line:#cdb79c;
+  --accent:#775332;--active:#805b3b;--active-ink:#fff8ed;--track:#dfcfb7;
+  --grid:#d9c7af;--focus:#815a36;--warning:#a02e25;
+  --heat0:#efe2cf;--heat1:#e1d9b8;--heat2:#b8c49c;--heat3:#839c73;--heat4:#46674e;
+}
+html:is([data-theme=dark],[data-theme=cozy]){
+  --ink:var(--theme-ink);--muted:var(--theme-muted);--line:var(--theme-line);
+  --coc-border:var(--theme-line);background:var(--page);color:var(--theme-ink);
+}
+html:is([data-theme=dark],[data-theme=cozy]) body{background:var(--page);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) main{background:var(--page)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(header,.pageNav,.panel,.filters,.metric,.advancedWrap,.manageSection,.menu,.finderPerson,dialog,.record){background:var(--surface);border-color:var(--theme-line);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.manageSection>summary,.fiscalControls,.cozyTip,.cozyNote,.insightCards>div,.periodCompare>div,.peopleOverviewNote,.tag,thead th,.langSwitch){background:var(--raised);border-color:var(--theme-line);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(h1,h2,h3,strong,label,summary,.cocWordmark,.metric strong,.programTile strong,.typeLegendRow>div,.peopleOverviewNote strong,.record h3,.peopleSummaryTable th,.peopleSummaryTable td){color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(p,small,.hint,.note,.chipnote,.muted,.soft,.eyebrow,.heading p,.metric span,.field>span,.pageNav .navTitle,.legend,.legend span,#chartHelp,.heatLegend,.peopleExportBar span,.peopleOverviewNote span,.typeDonut small,.fiscalControls p,.fiscalControls small){color:var(--theme-muted)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(input,select,textarea,.pickbutton,.quiet,.chip,.analysisNav button,.finderTopics button,.pager button,.qualityTiles>button,.langSwitch button){background:var(--surface);color:var(--theme-ink);border-color:var(--theme-line)}
+html:is([data-theme=dark],[data-theme=cozy]) ::placeholder{color:var(--theme-muted);opacity:1}
+html:is([data-theme=dark],[data-theme=cozy]) :is(button:disabled,input:disabled,select:disabled){opacity:.55}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.quiet:hover,.chip:hover,.finderTopics button:hover,.pager button:hover,.option:hover,.programTile:hover){background:var(--raised);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.primary,.chip.active,.analysisNav button.active,.langSwitch button[aria-pressed=true],.qualityTiles>button.active,.programTile.is-active){background:var(--active);border-color:var(--accent);color:var(--active-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.primary,.chip.active,.analysisNav button.active,.programTile.is-active) :is(span,strong){color:var(--active-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.linkbutton,.finderPerson summary,.analysisDetails summary,.cozyTip strong,.cozyNote strong,.pageNav a,.record a){color:var(--accent)}
+html:is([data-theme=dark],[data-theme=cozy]) .pageNav a[aria-current=location]{background:var(--raised);color:var(--accent);box-shadow:none;border-bottom-color:var(--accent)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.typeTrack,.ranktrack,.viztrack,.mixtrack){background:var(--track)}
+html:is([data-theme=dark],[data-theme=cozy]) .typeDonut:before{background:var(--surface)}
+html:is([data-theme=dark],[data-theme=cozy]) .typeDonut strong{background:transparent;color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(th,td,.peopleSummaryTable tbody th,.groupedHeatTable tbody th){background:var(--surface);color:var(--theme-ink);border-color:var(--theme-line)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.typeLegendRow,.programTile,.analysisNav,.record,.metrics,.heading){border-color:var(--theme-line)}
+html:is([data-theme=dark],[data-theme=cozy]) .staffAvatar{background:var(--raised);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) .warning{color:var(--warning)}
+html:is([data-theme=dark],[data-theme=cozy]) :focus-visible{outline-color:var(--focus)}
+html:is([data-theme=dark],[data-theme=cozy]) .chart svg text{fill:var(--theme-muted);stroke:none}
+html:is([data-theme=dark],[data-theme=cozy]) .chart svg text.chartValueLabel{fill:var(--theme-ink);stroke:var(--surface);stroke-width:3px}
+html:is([data-theme=dark],[data-theme=cozy]) .chart svg text.chartSegmentLabel{fill:#fff;stroke:none}
+html:is([data-theme=dark],[data-theme=cozy]) .chart svg :is(path,line)[stroke^="#e"]{stroke:var(--grid)}
+html:is([data-theme=dark],[data-theme=cozy]) .chart svg polyline[stroke="#16858d"]{stroke:var(--accent)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(.h0,.h1,.h2,.h3,.h4){color:var(--theme-ink);border-color:var(--theme-line)}
+html:is([data-theme=dark],[data-theme=cozy]) .h0{background:var(--heat0)}
+html:is([data-theme=dark],[data-theme=cozy]) .h1{background:var(--heat1)}
+html:is([data-theme=dark],[data-theme=cozy]) .h2{background:var(--heat2)}
+html:is([data-theme=dark],[data-theme=cozy]) .h3{background:var(--heat3);color:#fff}
+html:is([data-theme=dark],[data-theme=cozy]) .h4{background:var(--heat4);color:#fff}
+html[data-theme=dark] .h4{color:#122c29}
+html:is([data-theme=dark],[data-theme=cozy]) dialog::backdrop{background:#08111acc}

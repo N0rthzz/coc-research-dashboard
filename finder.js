@@ -26,7 +26,7 @@ function drawFinder() {
     : 'ไม่พบคำนี้ในรายละเอียดผลงาน ลองใช้คำภาษาอังกฤษอื่นหรือคำที่สั้นลง';
   finderResults.innerHTML = names.map(name => {
     const papers = [...groups.get(name).values()].sort((a, b) => b.year - a.year || b.month - a.month);
-    return `<article class="finderPerson"><h3>${escapeHTML(name)}</h3><p>พบ ${papers.length} เรื่องที่มีคำค้น</p><details><summary>ดูผลงานที่พบ</summary><ol>${papers.map(row => `<li>${escapeHTML(row.detail)}<small>พ.ศ. ${row.year + 543} · ${escapeHTML(LABELS[row.type] || row.type)}</small></li>`).join('')}</ol></details></article>`;
+    return `<article class="finderPerson"><h3>${staffIdentity(name)}</h3><p>พบ ${papers.length} เรื่องที่มีคำค้น</p><details><summary>ดูผลงานที่พบ</summary><ol>${papers.map(row => `<li>${escapeHTML(row.detail)}<small>พ.ศ. ${row.year + 543} · ${escapeHTML(LABELS[row.type] || row.type)}</small></li>`).join('')}</ol></details></article>`;
   }).join('');
 }
 

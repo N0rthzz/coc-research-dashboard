@@ -516,7 +516,7 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as exc:
             print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
-        if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png"}:
+        if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png", "/theme.js", "/staff-portraits.js", "/appearance.css"}:
             return self.respond(404, {"error": "ไม่พบข้อมูล"})
         self._serving_static = True
         return super().do_GET()

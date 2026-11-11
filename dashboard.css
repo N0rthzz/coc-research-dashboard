@@ -49,3 +49,22 @@ header strong{font-size:16px}header small{font-size:13px}.pageNav a{font-size:14
 @media(max-width:1250px){.typesComposition{grid-template-columns:1fr}.typeDonut{margin:auto}}
 @media(max-width:900px){.peopleControls{grid-template-columns:1fr 1fr}.fiscalControls{grid-template-columns:1fr 1fr}.peopleOverviewNote{align-items:start;flex-direction:column;gap:5px}.typesComposition{grid-template-columns:130px 1fr}.groupedHeatTable th:first-child{width:190px}.groupedHeatTable{min-width:700px}}
 @media(max-width:620px){.heading h1{font-size:26px}.heading p{font-size:14px}.metric span{font-size:13px}.metric strong{font-size:30px}.peopleSummaryTable th,.peopleSummaryTable td{padding:10px 6px;font-size:13px}.peopleSummaryTable thead th{font-size:12px}.peopleSummaryTable th:first-child{width:43%}.peopleSummaryTable th:nth-child(2){width:23%}.peopleSummaryTable th:last-child,.peopleSummaryTable td:last-child{display:none}.summaryTotal .typeTrack{display:none}.peopleControls{gap:10px}.peopleControls select,.peopleControls input{font-size:14px;padding:6px}.typeLegendRow>div{font-size:13px}.pageNav a{font-size:13px}}
+/* Personal appearance and faculty identities. */
+.cozyTip,.cozyNote{display:flex}.cozyTip img,.cozyNote img{display:block;mix-blend-mode:normal}.cozyTip{margin-bottom:18px}.cozyNote{margin:12px 0;padding:8px 12px}
+.themeControl{display:flex;align-items:center;gap:6px;font-size:13px}.themeControl select{padding:5px;border:1px solid var(--line);border-radius:5px;background:var(--surface,#fff);color:inherit}
+.staffIdentity{display:inline-flex;align-items:center;gap:9px;vertical-align:middle;text-align:left}.staffAvatar{position:relative;display:inline-grid;place-items:center;width:36px;height:36px;flex:none;border-radius:50%;overflow:hidden;background:#dbeaec;color:#234c54;font-size:12px;font-weight:600}.staffAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}.option .staffIdentity{flex:1}.headerRight{flex-wrap:wrap}
+html[data-theme=cozy]{--surface:#fffaf0;--page:#faf0e1;--theme-ink:#594c40;--theme-muted:#736458;--theme-line:#e4d6c5;--brand:#8a6548;color-scheme:light}
+html[data-theme=dark]{--surface:#202c38;--page:#15202b;--theme-ink:#e2eaf1;--theme-muted:#b4c4d1;--theme-line:#425264;--brand:#65cbd1;color-scheme:dark}
+html[data-theme=dark],html[data-theme=cozy]{background:var(--page);color:var(--theme-ink)}
+html[data-theme=dark] body,html[data-theme=cozy] body{background:var(--page);color:var(--theme-ink)}
+html:is([data-theme=dark],[data-theme=cozy]) :is(header,main,.pageNav,.panel,.filters,.metric,.advancedWrap,.manageSection,.fiscalControls,.menu,.finderPerson,.insightCards>div,.periodCompare>div,.cozyTip,.cozyNote,dialog){background-color:var(--surface);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme=dark] :is(h1,h2,h3,strong,small,.hint,.muted,.soft,.eyebrow,label,.field>span,.pageNav a,.pickbutton,.quiet,.record,.programTile,.peopleControls,.peopleSummaryTable th,.peopleSummaryTable td),html[data-theme=cozy] :is(h1,h2,h3,strong,small,.hint,.muted,.soft,.eyebrow,label,.field>span,.pageNav a,.pickbutton,.quiet,.record,.programTile){color:var(--theme-ink)}
+html[data-theme=dark] :is(input,select,textarea,button,.record,.tag,th,td,.programTile,.peopleOverviewNote,.peopleExportBar,.analysisNav button,.chip,.typeDonut strong),html[data-theme=cozy] :is(input,select,textarea,.quiet,.record,.tag,th,td,.programTile){background-color:var(--surface);color:var(--theme-ink);border-color:var(--theme-line)}
+html[data-theme=dark] :is(.primary,.chip.active,.analysisNav button.active){background:#176e77;color:#fff}
+html[data-theme=dark] .programTile.is-active,html[data-theme=dark] .programTile:hover{background:#294551}
+html[data-theme=dark] svg text{fill:#c6d6e3}
+@media(max-width:620px){header{flex-wrap:wrap}.headerRight{gap:12px}.staffAvatar{width:30px;height:30px}}
+
+/* Give the mascot a little more presence without crowding the text. */
+.cozyTip img{width:96px;height:96px}.cozyNote img{width:54px;height:54px}
+@media(max-width:620px){.cozyTip img{width:72px;height:72px}.cozyNote img{width:44px;height:44px}}

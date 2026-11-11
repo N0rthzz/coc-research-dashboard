@@ -29,6 +29,9 @@ class StaticAssetTests(unittest.TestCase):
                             self.assertEqual(response.read(), contents)
                             self.assertEqual(response.headers.get("Cache-Control"), "no-cache")
                             self.assertEqual(urlsplit(asset).query, "v=" + hashlib.sha256(contents.replace(b'\r\n', b'\n')).hexdigest()[:12])
+                with urlopen(f"http://127.0.0.1:{httpd.server_port}/cozy.png") as response:
+                    self.assertEqual(response.headers.get_content_type(), "image/png")
+                    self.assertEqual(response.read(), (server.ROOT / "cozy.png").read_bytes())
             finally:
                 httpd.shutdown()
                 httpd.server_close()
