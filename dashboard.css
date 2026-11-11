@@ -65,6 +65,7 @@ html[data-theme=dark] .programTile.is-active,html[data-theme=dark] .programTile:
 html[data-theme=dark] svg text{fill:#c6d6e3}
 @media(max-width:620px){header{flex-wrap:wrap}.headerRight{gap:12px}.staffAvatar{width:30px;height:30px}}
 
+.staffForm{padding:18px;border:1px solid var(--theme-line,#dbe3e5);border-radius:6px;display:grid;gap:12px;align-content:start}.staffForm h3{margin:0}.staffForm>label,.staffDirectory>label{display:grid;gap:6px}.staffForm input[type=text],.staffForm input:not([type]),.staffDirectory input{width:100%;padding:10px;border:1px solid var(--theme-line,#c6d3d6);border-radius:4px}.staffForm fieldset{border:1px solid var(--theme-line,#c6d3d6);display:flex;flex-wrap:wrap;gap:12px;padding:12px}.staffForm fieldset label{display:flex;align-items:center;gap:5px}.staffManageRow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--theme-line,#dbe3e5)}.staffManageRow .hint{margin:5px 0}.staffManageRow>div:last-child{white-space:nowrap}#programGrid.programgrid{display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,2fr);align-items:start;gap:24px}.staffDirectory{min-width:0}@media(max-width:760px){#programGrid.programgrid{grid-template-columns:1fr}.staffManageRow{align-items:start;flex-wrap:wrap}}
 /* Give the mascot a little more presence without crowding the text. */
 .cozyTip img{width:96px;height:96px}.cozyNote img{width:54px;height:54px}
 @media(max-width:620px){.cozyTip img{width:72px;height:72px}.cozyNote img{width:44px;height:44px}}

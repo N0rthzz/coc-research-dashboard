@@ -367,6 +367,52 @@ def load(path, default):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def manage_staff(body):
+    """Called under LOCK. Keep faculty and their publication names in sync."""
+    def key(value):
+        import unicodedata
+        return " ".join(unicodedata.normalize("NFKC", str(value)).split()).upper()
+
+    rows, mapping = load(DATA, []), load(PROGRAMS, {})
+    names = set(mapping) | {row["staff"] for row in rows}
+    original = normalize(body.get("original"))
+    matches = {name for name in names if original and key(name) == key(original)}
+    if original and not matches:
+        raise ValueError("ไม่พบอาจารย์ กรุณาโหลดข้อมูลใหม่")
+    linked = [row for row in rows if row["staff"] in matches]
+    updated = dict(mapping)
+    if body.get("action") == "delete":
+        if not original:
+            raise ValueError("กรุณาระบุอาจารย์")
+        if linked:
+            raise ValueError(f"ลบไม่ได้: อาจารย์มีผลงานเชื่อมอยู่ {len(linked)} รายการ กรุณาแก้ชื่ออาจารย์ในผลงานก่อน")
+        for name in matches:
+            updated.pop(name, None)
+        save(PROGRAMS, updated)
+        return {"ok": True}
+    name = normalize(body.get("name"))
+    programs = body.get("programs", [])
+    if not name or len(name) > 180:
+        raise ValueError("กรุณาระบุชื่ออาจารย์ไม่เกิน 180 ตัวอักษร")
+    if not isinstance(programs, list) or any(not isinstance(p, str) or p not in PROGRAM_VALUES for p in programs):
+        raise ValueError("หลักสูตรไม่ถูกต้อง")
+    if any(key(n) == key(name) for n in names - matches):
+        raise ValueError("ชื่ออาจารย์นี้มีอยู่แล้ว")
+    for old in matches:
+        updated.pop(old, None)
+    updated[name] = ", ".join(dict.fromkeys(programs)) or "ยังไม่ระบุ"
+    renamed = [{**row, "staff": name} if row["staff"] in matches else row for row in rows]
+    # If the second write fails, restore the faculty mapping and surface the error.
+    save(PROGRAMS, updated)
+    if renamed != rows:
+        try:
+            save(DATA, renamed)
+        except Exception:
+            save(PROGRAMS, mapping)
+            raise
+    return {"ok": True, "linked": len(linked)}
+
+
 def save(path, value):
     if STORAGE_BACKEND == "apps_script":
         if path == DATA:
@@ -516,7 +562,7 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as exc:
             print(f"[API ERROR] {path}: {type(exc).__name__}: {exc}", flush=True)
             return self.respond(503, {"error": "เชื่อมต่อแหล่งข้อมูลไม่สำเร็จ กรุณาตรวจ Terminal ของเซิร์ฟเวอร์"})
-        if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png", "/theme.js", "/staff-portraits.js", "/appearance.css"}:
+        if path not in {"/", "/index.html", "/app.css", "/dashboard.css", "/enhance.js", "/analytics.js", "/finder.js", "/period.js", "/heatmap-export.js", "/i18n.js", "/cozy.png", "/theme.js", "/staff-portraits.js", "/appearance.css", "/staff-manager.js"}:
             return self.respond(404, {"error": "ไม่พบข้อมูล"})
         self._serving_static = True
         return super().do_GET()
@@ -563,6 +609,8 @@ class Handler(SimpleHTTPRequestHandler):
                                               "existing_preview": duplicate_examples, "invalid_preview": invalid_examples,
                                               "candidates": fresh})
                 body = json.loads(raw)
+                if path == "/api/staff":
+                    return self.respond(200, manage_staff(body))
                 if path == "/api/restore":
                     try:
                         seq = int(body.get("seq"))
